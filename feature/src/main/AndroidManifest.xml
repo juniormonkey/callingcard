@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="au.id.martinstrauss.martinstrauss.feature">
+
+  <application>
+    <activity
+        android:configChanges="orientation|keyboardHidden|screenSize"
+        android:label="@string/app_name"
+        android:name=".CallingCardActivity"
+        android:theme="@style/FullscreenTheme">
+      <intent-filter android:order="1" android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW"/>
+
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+
+        <data android:scheme="http" />
+        <data android:scheme="https" />
+        <data android:host="martinstrauss.id.au" />
+        <data android:pathPattern="/app/.*" />
+
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+      <meta-data
+          android:name="default-url"
+          android:value="https://martinstrauss.id.au/app/" />
+    </activity>
+  </application>
+
+</manifest>

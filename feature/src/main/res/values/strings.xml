@@ -1,0 +1,10 @@
+<resources>
+
+  <string name="name">Martin Strauss</string>
+  <string name="email">martin@ockle.org</string>
+  <string name="phone">+1 (415) 230-1376</string>
+  <string name="facebook">martin.strauss</string>
+  <string name="youtube">juniormonkey</string>
+  <string name="twitter">martin_strauss</string>
+  <string name="linkedin">martinstrauss</string>
+</resources>
