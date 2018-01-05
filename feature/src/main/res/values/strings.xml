@@ -1,10 +1,10 @@
 <resources>
 
   <string name="name">Martin Strauss</string>
-  <string name="email">martin@ockle.org</string>
-  <string name="phone">+1 (415) 230-1376</string>
-  <string name="facebook">martin.strauss</string>
-  <string name="youtube">juniormonkey</string>
-  <string name="twitter">martin_strauss</string>
-  <string name="linkedin">martinstrauss</string>
+  <string name="email"><a href="mailto:martin@ockle.org">martin@ockle.org</a></string>
+  <string name="phone"><a href="tel:+14152301376">+1 (415) 230-1376</a></string>
+  <string name="facebook"><a href="https://facebook.com/martin.strauss">martin.strauss</a></string>
+  <string name="youtube"><a href="https://youtube.com/juniormonkey">juniormonkey</a></string>
+  <string name="twitter"><a href="https://twitter.com/martin_strauss">martin_strauss</a></string>
+  <string name="linkedin"><a href="https://linkedin.com/in/martinstrauss">martinstrauss</a></string>
 </resources>
