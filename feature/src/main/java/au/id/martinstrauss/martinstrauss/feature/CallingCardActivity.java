@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -83,9 +84,12 @@ public class CallingCardActivity extends AppCompatActivity {
   @Override
   protected void onPostCreate(Bundle savedInstanceState) {
     super.onPostCreate(savedInstanceState);
-    // Trigger the initial hide() shortly after the activity has been
-    // created, to briefly hint to the user that UI controls
-    // are available.
+    delayedHide(100);
+  }
+
+  @Override
+  protected void onPostResume() {
+    super.onPostResume();
     delayedHide(100);
   }
 
@@ -112,12 +116,15 @@ public class CallingCardActivity extends AppCompatActivity {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    flipCard();
+    if(event.getAction() == MotionEvent.ACTION_UP) {
+      flipCard();
+    }
     return super.onTouchEvent(event);
   }
 
   private void flipCard() {
     if (mShowingBack) {
+      mShowingBack = false;
       getFragmentManager().popBackStack();
       return;
     }
@@ -152,16 +159,16 @@ public class CallingCardActivity extends AppCompatActivity {
    */
   public static class CardBackFragment extends Fragment {
     private View mCardBackView;
-    private View mContactDetailsView;
+    private ViewGroup mContactDetailsViewGroup;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) {
       mCardBackView = inflater.inflate(R.layout.fragment_card_back, container, false);
 
-      mContactDetailsView = mCardBackView.findViewById(R.id.contact_details);
+      mContactDetailsViewGroup = mCardBackView.findViewById(R.id.contact_details);
 
-      addContactMethod(inflater, R.drawable.email, R.string.email);
+      addContactMethod(inflater,  R.drawable.email, R.string.email);
       addContactMethod(inflater, R.drawable.phone, R.string.phone);
       addContactMethod(inflater, R.drawable.facebook, R.string.facebook);
       addContactMethod(inflater, R.drawable.youtube, R.string.youtube);
@@ -174,16 +181,15 @@ public class CallingCardActivity extends AppCompatActivity {
     private void addContactMethod(LayoutInflater inflater, int imageResource, int textResource) {
       View contactMethodView = inflater.inflate(R.layout.contact_method, (ViewGroup) mCardBackView,false);
 
-      ImageView icon = (ImageView) contactMethodView.findViewById(R.id.icon);
+      ImageView icon = contactMethodView.findViewById(R.id.icon);
       icon.setImageResource(imageResource);
 
-      TextView text = (TextView) contactMethodView.findViewById(R.id.text);
+      TextView text = contactMethodView.findViewById(R.id.text);
       text.setText(textResource);
       text.setMovementMethod(LinkMovementMethod.getInstance());
 
-      ViewGroup contactDetailsViewGroup = (ViewGroup) mContactDetailsView;
       int heightInPixels = (int) (36 * getResources().getDisplayMetrics().scaledDensity);
 
-      contactDetailsViewGroup.addView(contactMethodView, new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, heightInPixels));
+      mContactDetailsViewGroup.addView(contactMethodView, new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, heightInPixels));
     }  }
 }
