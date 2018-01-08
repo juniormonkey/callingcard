@@ -3,10 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
     }
-    compileSdkVersion 21
+    compileSdkVersion 26
     defaultConfig {
         applicationId "au.id.martinstrauss.martinstrauss"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 3
         versionName '0.3'
@@ -15,7 +15,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
