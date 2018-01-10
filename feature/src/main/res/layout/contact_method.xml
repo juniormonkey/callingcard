@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="36sp">
   <ImageView
@@ -8,7 +9,7 @@
       android:layout_height="24sp"
       android:layout_gravity="center_vertical"
       android:layout_marginRight="6sp"
-      android:contentDescription="email"/>
+      tools:src="@drawable/email"/>
   <TextView
       android:id="@+id/text"
       android:layout_width="match_parent"
@@ -17,5 +18,6 @@
       android:fontFamily="serif"
       android:textColor="#000000"
       android:textColorLink="#0c0c0c"
-      android:textSize="24sp"/>
+      android:textSize="24sp"
+      tools:text="@string/email"/>
 </LinearLayout>
