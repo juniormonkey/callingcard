@@ -18,7 +18,7 @@
         <data android:scheme="https" />
         <data android:host="martinstrauss.id.au" />
         <data android:host="www.martinstrauss.id.au" />
-        <data android:pathPrefix="/app" />
+        <data android:pathPrefix="/" />
 
       </intent-filter>
       <intent-filter>
@@ -28,7 +28,7 @@
       </intent-filter>
       <meta-data
           android:name="default-url"
-          android:value="https://martinstrauss.id.au/app/" />
+          android:value="https://martinstrauss.id.au/" />
     </activity>
   </application>
 
