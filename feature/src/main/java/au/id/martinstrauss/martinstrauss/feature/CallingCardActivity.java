@@ -47,15 +47,13 @@ public class CallingCardActivity extends AppCompatActivity {
     public void run() {
       // Delayed removal of status and navigation bar
 
-      // Note that some of these constants are new as of API 16 (Jelly Bean)
-      // and API 19 (KitKat). It is safe to use them, as they are inlined
-      // at compile-time and do nothing on earlier devices.
-      mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-          | View.SYSTEM_UI_FLAG_FULLSCREEN
-          | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-          | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-          | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-          | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+      mContentView.setSystemUiVisibility(
+          View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+              | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+              | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
   };
   private final Runnable mHideRunnable = new Runnable() {
@@ -72,6 +70,10 @@ public class CallingCardActivity extends AppCompatActivity {
     setContentView(R.layout.activity_calling_card);
 
     mContentView = findViewById(R.id.container);
+
+    mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
     if (savedInstanceState == null) {
       getFragmentManager()
@@ -116,7 +118,7 @@ public class CallingCardActivity extends AppCompatActivity {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if(event.getAction() == MotionEvent.ACTION_UP) {
+    if (event.getAction() == MotionEvent.ACTION_UP) {
       flipCard();
     }
     return super.onTouchEvent(event);
@@ -149,7 +151,7 @@ public class CallingCardActivity extends AppCompatActivity {
   public static class CardFrontFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-        Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
       return inflater.inflate(R.layout.fragment_card_front, container, false);
     }
   }
@@ -163,12 +165,12 @@ public class CallingCardActivity extends AppCompatActivity {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-        Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
       mCardBackView = inflater.inflate(R.layout.fragment_card_back, container, false);
 
       mContactDetailsViewGroup = mCardBackView.findViewById(R.id.contact_details);
 
-      addContactMethod(inflater,  R.drawable.email, R.string.email);
+      addContactMethod(inflater, R.drawable.email, R.string.email);
       addContactMethod(inflater, R.drawable.phone, R.string.phone);
       addContactMethod(inflater, R.drawable.facebook, R.string.facebook);
       addContactMethod(inflater, R.drawable.youtube, R.string.youtube);
@@ -179,7 +181,7 @@ public class CallingCardActivity extends AppCompatActivity {
     }
 
     private void addContactMethod(LayoutInflater inflater, int imageResource, int textResource) {
-      View contactMethodView = inflater.inflate(R.layout.contact_method, (ViewGroup) mCardBackView,false);
+      View contactMethodView = inflater.inflate(R.layout.contact_method, (ViewGroup) mCardBackView, false);
 
       ImageView icon = contactMethodView.findViewById(R.id.icon);
       icon.setImageResource(imageResource);
@@ -191,5 +193,6 @@ public class CallingCardActivity extends AppCompatActivity {
       int heightInPixels = (int) (36 * getResources().getDisplayMetrics().scaledDensity);
 
       mContactDetailsViewGroup.addView(contactMethodView, new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, heightInPixels));
-    }  }
+    }
+  }
 }
