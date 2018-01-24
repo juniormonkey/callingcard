@@ -2,12 +2,15 @@ package au.id.martinstrauss.martinstrauss.feature;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.method.LinkMovementMethod;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,7 +24,8 @@ import android.widget.TextView;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class CallingCardActivity extends AppCompatActivity {
+public class CallingCardActivity extends AppCompatActivity implements
+    GestureDetector.OnGestureListener {
 
   /**
    * The number of milliseconds to wait after user interaction before hiding the system UI.
@@ -40,6 +44,7 @@ public class CallingCardActivity extends AppCompatActivity {
   private boolean mShowingBack = false;
 
   private final Handler mHideHandler = new Handler();
+  private GestureDetectorCompat mDetector;
   private View mContentView;
   private final Runnable mHidePart2Runnable = new Runnable() {
     @SuppressLint("InlinedApi")
@@ -63,6 +68,9 @@ public class CallingCardActivity extends AppCompatActivity {
     }
   };
 
+  private CardBackFragment mCardBackFragment = null;
+  private CardFrontFragment mCardFrontFragment = null;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -75,12 +83,16 @@ public class CallingCardActivity extends AppCompatActivity {
         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
+    mCardFrontFragment = new CardFrontFragment();
+
     if (savedInstanceState == null) {
       getFragmentManager()
           .beginTransaction()
-          .add(R.id.container, new CardFrontFragment())
+          .add(R.id.container, mCardFrontFragment)
           .commit();
     }
+
+    mDetector = new GestureDetectorCompat(this, this);
   }
 
   @Override
@@ -118,31 +130,83 @@ public class CallingCardActivity extends AppCompatActivity {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if (event.getAction() == MotionEvent.ACTION_UP) {
-      flipCard();
-    }
+    this.mDetector.onTouchEvent(event);
     return super.onTouchEvent(event);
   }
 
-  private void flipCard() {
-    if (mShowingBack) {
-      mShowingBack = false;
-      getFragmentManager().popBackStack();
-      return;
+  @Override
+  public boolean onFling(MotionEvent event1, MotionEvent event2,
+                         float velocityX, float velocityY) {
+    if (Math.abs(velocityX) > Math.abs(velocityY)) {
+      flipCard((velocityX < 0));
     }
+    return true;
+  }
 
-    mShowingBack = true;
+  @Override
+  public boolean onDown(MotionEvent e) {
+    return true;
+  }
 
-    getFragmentManager()
-        .beginTransaction()
-        .setCustomAnimations(
-            R.animator.card_flip_right_in,
-            R.animator.card_flip_right_out,
-            R.animator.card_flip_left_in,
-            R.animator.card_flip_left_out)
-        .replace(R.id.container, new CardBackFragment())
-        .addToBackStack(null)
-        .commit();
+  @Override
+  public void onLongPress(MotionEvent e) {
+  }
+
+  @Override
+  public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+    return true;
+  }
+
+  @Override
+  public void onShowPress(MotionEvent e) {
+  }
+
+  @Override
+  public boolean onSingleTapUp(MotionEvent event) {
+    DisplayMetrics dm = new DisplayMetrics();
+    getWindowManager().getDefaultDisplay().getMetrics(dm);
+    int width=dm.widthPixels;
+
+    boolean rtl = event.getX() > (width / 2);
+    flipCard(rtl);
+    flipCard(!rtl);
+    return true;
+  }
+
+  private Fragment getCardFragment() {
+    if (mShowingBack) {
+      if (mCardBackFragment == null) {
+        mCardBackFragment = new CardBackFragment();
+      }
+      return mCardBackFragment;
+    }
+    return mCardFrontFragment;
+  }
+
+  private void flipCard(boolean rtl) {
+    mShowingBack = !mShowingBack;
+
+    if (rtl) {
+      getFragmentManager()
+          .beginTransaction()
+          .setCustomAnimations(
+              R.animator.card_flip_right_in,
+              R.animator.card_flip_right_out,
+              R.animator.card_flip_left_in,
+              R.animator.card_flip_left_out)
+          .replace(R.id.container, getCardFragment())
+          .commit();
+    } else {
+      getFragmentManager()
+          .beginTransaction()
+          .setCustomAnimations(
+              R.animator.card_flip_left_in,
+              R.animator.card_flip_left_out,
+              R.animator.card_flip_right_in,
+              R.animator.card_flip_right_out)
+          .replace(R.id.container, getCardFragment())
+          .commit();
+    }
   }
 
   /**
