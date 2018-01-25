@@ -2,6 +2,12 @@ package au.id.martinstrauss.martinstrauss.feature;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.provider.ContactsContract;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +25,13 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.android.instantapps.InstantApps;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -137,8 +150,25 @@ public class CallingCardActivity extends AppCompatActivity implements
   @Override
   public boolean onFling(MotionEvent event1, MotionEvent event2,
                          float velocityX, float velocityY) {
+    DisplayMetrics dm = new DisplayMetrics();
+    getWindowManager().getDefaultDisplay().getMetrics(dm);
+    int height = dm.heightPixels;
+    if (event1.getY() <= 0 || event1.getY() >= height
+        || event2.getY() <= 0 || event2.getY() >= height) {
+      return false;
+    }
     if (Math.abs(velocityX) > Math.abs(velocityY)) {
       flipCard((velocityX < 0));
+    } else if (velocityY < 0) {
+      shareUrl();
+    } else {
+      if (InstantApps.isInstantApp(this)) {
+        Intent intent = new Intent(this, CallingCardActivity.class);
+        InstantApps.showInstallPrompt(this, intent, 1,
+            getResources().getString(R.string.url));
+      } else {
+        saveContact();
+      }
     }
     return true;
   }
@@ -165,7 +195,7 @@ public class CallingCardActivity extends AppCompatActivity implements
   public boolean onSingleTapUp(MotionEvent event) {
     DisplayMetrics dm = new DisplayMetrics();
     getWindowManager().getDefaultDisplay().getMetrics(dm);
-    int width=dm.widthPixels;
+    int width = dm.widthPixels;
 
     boolean rtl = event.getX() > (width / 2);
     flipCard(rtl);
@@ -207,6 +237,36 @@ public class CallingCardActivity extends AppCompatActivity implements
           .replace(R.id.container, getCardFragment())
           .commit();
     }
+  }
+
+  private void shareUrl() {
+    Intent sendIntent = new Intent();
+    sendIntent.setAction(Intent.ACTION_SEND);
+    sendIntent.putExtra(Intent.EXTRA_SUBJECT, getResources().getText(R.string.name));
+    sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getText(R.string.url));
+    sendIntent.setType("text/plain");
+    startActivity(sendIntent);
+  }
+
+  private void saveContact() {
+    Intent intent = new Intent(ContactsContract.Intents.Insert.ACTION);
+    intent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
+    intent
+        .putExtra(ContactsContract.Intents.Insert.NAME, getResources().getText(R.string.name))
+        .putExtra(ContactsContract.Intents.Insert.EMAIL, getResources().getText(R.string.email))
+        .putExtra(ContactsContract.Intents.Insert.EMAIL_TYPE, ContactsContract.CommonDataKinds.Email.TYPE_HOME)
+        .putExtra(ContactsContract.Intents.Insert.PHONE, getResources().getText(R.string.phone))
+        .putExtra(ContactsContract.Intents.Insert.PHONE_TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+
+    ArrayList<ContentValues> data = new ArrayList<ContentValues>();
+    ContentValues row = new ContentValues();
+    row.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE);
+    row.put(ContactsContract.CommonDataKinds.Website.URL, getResources().getString(R.string.url));
+    row.put(ContactsContract.CommonDataKinds.Website.TYPE, ContactsContract.CommonDataKinds.Website.TYPE_HOME);
+    data.add(row);
+    intent.putExtra(ContactsContract.Intents.Insert.DATA, data);
+
+    startActivity(intent);
   }
 
   /**
